@@ -197,6 +197,7 @@ void Locate_Rle(long num,u32 frequency,DIR_Type dir) //相对定位函数
 	rcr_remainder=num%(RCR_VAL+1);//重复计数余数部分
 	is_rcr_finish=0;//重复计数器未设置完成
 	TIM8_Startup(frequency);//开启TIM8
+	
 }
 /********************************************
 //绝对定位函数 
