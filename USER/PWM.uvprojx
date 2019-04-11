@@ -31,8 +31,8 @@
           <SLE66CMisc></SLE66CMisc>
           <SLE66AMisc></SLE66AMisc>
           <SLE66LinkerMisc></SLE66LinkerMisc>
-          <SFDFile>$$Device:STM32F407IG$SVD\STM32F40x.svd</SFDFile>
-          <bCustSvd>0</bCustSvd>
+          <SFDFile>C:\Keil_v5\ARM\Pack\Keil\STM32F4xx_DFP\1.0.8\SVD\STM32F40x.SFR</SFDFile>
+          <bCustSvd>1</bCustSvd>
           <UseEnv>0</UseEnv>
           <BinPath></BinPath>
           <IncludePath></IncludePath>

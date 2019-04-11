@@ -24,8 +24,8 @@ int main(void)
 	int pst=0,pst_old=0;
 	float	k1,k2,k3;//捕获转换系数
 	k1=(float)(500-0)/(float)(215-87);//捕获的测量值是87~215，标定到0~500
-	k2=(float)50000/(float)(21-15);
-	k3=(float)50000/(float)(15-8);
+	k2=(float)45000/(float)(21-15);
+	k3=(float)45000/(float)(15-8);
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);//设置系统中断优先级分组2
 	delay_init(168);  //初始化延时函数
 	uart_init(115200);//初始化串口波特率为115200
@@ -105,13 +105,13 @@ int main(void)
 		
 		pst=count3/10;  //将遥控器输入标定到(8,21)
 		int flag=0;			//实际位置与设定位置一致
-		if(current_pos==target_pos)//判断当前位置与设定位置
+		if(pst==pst_old)//判断当前位置与设定位置
 		{
 			delay_ms(100);
 			flag=1;
 		}
 		else flag=0;
-		if(pst>15&&pst<30&&flag&&pst!=pst_old)
+		if(pst>15&&pst<30&&pst!=pst_old)//左转
 		{
 			//printf("PST:%lld us\r\n",(long long)pst);
 			Locate_Abs((int)k2*(pst-15),7000);
@@ -119,21 +119,22 @@ int main(void)
 			//printf("PST_OLD:%lld us\r\n",(long long)pst_old);
 		
 		}
-		else if(pst>0&&pst<15&&flag&&pst!=pst_old)
+		else if(pst>0&&pst<15&&pst!=pst_old)//右转
 		{
 			//printf("PST:%lld us\r\n",(long long)pst);
-			Locate_Abs(-50000+(int)k3*(pst-8),7000);
+			Locate_Abs(-45000+(int)k3*(pst-8),7000);
 			pst_old=pst;
 			//printf("PST_OLD:%lld us\r\n",(long long)pst_old);
 		}
-		else if(pst==15&&flag&&pst!=pst_old)
+		else if(pst==15&&pst!=pst_old)
 		{
 			//printf("PST:%lld us\r\n",(long long)pst);
 			if(current_pos!=0)
 			{
 				Locate_Abs(0,7000);
-				pst_old =0;
+				
 			}
+			pst_old =15;
 			//printf("PST_OLD:%lld us\r\n",(long long)pst_old);
 		}
 	

@@ -26,9 +26,11 @@
 
 u8 rcr_remainder;   //重复计数余数部分
 u8 is_rcr_finish=1; //重复计数器是否设置完成
+
 long rcr_integer;	//重复计数整数部分
 long target_pos=0;  //有符号方向
 long current_pos=0; //有符号方向
+long rcrval=0;
 DIR_Type motor_dir=CW;//顺时针
 
 /************** 驱动器控制信号线初始化 ****************/
@@ -131,7 +133,8 @@ void TIM8_UP_TIM13_IRQHandler(void)
 			{
 				TIM8->RCR=RCR_VAL;//设置重复计数值
 				rcr_integer--;//减少RCR_VAL+1个脉冲				
-			}else if(rcr_remainder!=0)//余数部分脉冲 不位0
+			}
+			else if(rcr_remainder!=0)//余数部分脉冲 不位0
 			{
 				TIM8->RCR=rcr_remainder-1;//设置余数部分
 				rcr_remainder=0;//清零
@@ -144,9 +147,10 @@ void TIM8_UP_TIM13_IRQHandler(void)
 				current_pos+=(TIM8->RCR+1);//加上重复计数值
 			else          //否则方向为逆时针
 				current_pos-=(TIM8->RCR+1);//减去重复计数值			
-		}else
+		}
+		else
 		{
-out:		is_rcr_finish=1;//重复计数器设置完成
+out:	is_rcr_finish=1;//重复计数器设置完成
 			TIM_CtrlPWMOutputs(TIM8,DISABLE);	//MOE 主输出关闭
 			TIM_Cmd(TIM8, DISABLE);  //关闭TIM8				
 			printf("当前位置=%ld\r\n",current_pos);//打印输出
@@ -187,6 +191,7 @@ void Locate_Rle(long num,u32 frequency,DIR_Type dir) //相对定位函数
 	}
 	motor_dir=dir;//得到方向	
 	DRIVER_DIR1=motor_dir;//设置方向
+	DRIVER_DIR2=~DRIVER_DIR1;
 	
 	if(motor_dir==CW)//顺时针
 		target_pos=current_pos+num;//目标位置
@@ -206,10 +211,15 @@ void Locate_Rle(long num,u32 frequency,DIR_Type dir) //相对定位函数
 *********************************************/
 void Locate_Abs(long num,u32 frequency)//绝对定位函数
 {
-	if(TIM8->CR1&0x01)//上一次脉冲还未发送完成 直接返回
+	if(TIM8->CR1&0x01)//上一次脉冲还未发送完成 终止定时器 计算更新当前位置
 	{
-		printf("\r\nThe last time pulses is not send finished,wait please!\r\n");
-		return;
+		
+		TIM_Cmd(TIM8, DISABLE);
+		delay_ms(100);
+		rcrval=TIM8->RCR;
+		if(motor_dir==CCW)current_pos=target_pos+(rcr_integer*(RCR_VAL+1)+rcr_remainder+rcrval);
+		else current_pos=target_pos-(rcr_integer*(RCR_VAL+1)+rcr_remainder+rcrval);
+		//printf("\r\ncurrent_pos updated!\r\n");
 	}
 	if((frequency<20)||(frequency>100000))//脉冲频率不在范围内 直接返回
 	{
@@ -224,6 +234,7 @@ void Locate_Abs(long num,u32 frequency)//绝对定位函数
 		else
 			motor_dir=CCW;//逆时针
 		DRIVER_DIR1=motor_dir;//设置方向
+		DRIVER_DIR2=~DRIVER_DIR1;
 		
 		rcr_integer=abs(target_pos-current_pos)/(RCR_VAL+1);//重复计数整数部分
 		rcr_remainder=abs(target_pos-current_pos)%(RCR_VAL+1);//重复计数余数部分
