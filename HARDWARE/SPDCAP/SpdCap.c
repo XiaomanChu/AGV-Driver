@@ -134,7 +134,8 @@ void TIM3_IRQHandler(void)
 				TIM3CH1_CAPTURE_DOWNVAL = TIM_GetCapture1(TIM3);//记录下此时的定时器计数值
 				if (TIM3CH1_CAPTURE_DOWNVAL <= TIM3CH1_CAPTURE_UPVAL)
 				{
-					tim3_T1 = (65535-TIM3CH1_CAPTURE_UPVAL)+TIM3CH1_CAPTURE_DOWNVAL ;
+					//tim3_T1 = (65535-TIM3CH1_CAPTURE_UPVAL)+TIM3CH1_CAPTURE_DOWNVAL ;
+					tim3_T1 =65535;
 				}
 				else
 					tim3_T1 = 0;
@@ -160,7 +161,8 @@ void TIM3_IRQHandler(void)
 				TIM3CH2_CAPTURE_DOWNVAL = TIM_GetCapture2(TIM3);//记录下此时的定时器计数值
 				if (TIM3CH2_CAPTURE_DOWNVAL < TIM3CH2_CAPTURE_UPVAL)
 				{
-					tim3_T2 = (65535-TIM3CH2_CAPTURE_UPVAL)+TIM3CH2_CAPTURE_DOWNVAL ;
+					//tim3_T2 = (65535-TIM3CH2_CAPTURE_UPVAL)+TIM3CH2_CAPTURE_DOWNVAL ;
+					tim3_T2 =65535;
 					
 				}
 				else
@@ -195,7 +197,7 @@ void TIM3_IRQHandler(void)
 					tim3_T3 = 0;
 				tempup3 = TIM3CH3_CAPTURE_DOWNVAL - TIM3CH3_CAPTURE_UPVAL + tim3_T3;		//得到两个上升沿的时间差
 				TIM3CH3_CAPTURE_STA = 0;		//捕获标志位清零
-				f3=1000000/tempup3;
+				f3=tempup3;
 			}
 			else //第一次捕获到数据
 			{
@@ -215,13 +217,14 @@ void TIM3_IRQHandler(void)
 				TIM3CH4_CAPTURE_DOWNVAL = TIM_GetCapture4(TIM3);//记录下此时的定时器计数值
 				if (TIM3CH4_CAPTURE_DOWNVAL < TIM3CH4_CAPTURE_UPVAL)
 				{
-					tim3_T4 = (65535-TIM3CH4_CAPTURE_UPVAL)+TIM3CH4_CAPTURE_DOWNVAL ;
+					//tim3_T4 = (65535-TIM3CH4_CAPTURE_UPVAL)+TIM3CH4_CAPTURE_DOWNVAL ;
+					tim3_T4 =65535;
 				}
 				else
 					tim3_T4 = 0;
 				tempup4 = TIM3CH4_CAPTURE_DOWNVAL - TIM3CH4_CAPTURE_UPVAL + tim3_T4;		//得到两个上升沿的时间差
 				TIM3CH4_CAPTURE_STA = 0;		//捕获标志位清零
-				f4=1000000/tempup4;
+				f4=tempup4;
 			}
 			else //第一次捕获到数据
 			{

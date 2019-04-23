@@ -190,8 +190,8 @@ void Locate_Rle(long num,u32 frequency,DIR_Type dir) //相对定位函数
 		return;
 	}
 	motor_dir=dir;//得到方向	
-	DRIVER_DIR1=motor_dir;//设置方向
-	DRIVER_DIR2=~DRIVER_DIR1;
+	DRIVER_DIR2=motor_dir;//设置方向
+	DRIVER_DIR1=~DRIVER_DIR2;
 	
 	if(motor_dir==CW)//顺时针
 		target_pos=current_pos+num;//目标位置
@@ -233,8 +233,8 @@ void Locate_Abs(long num,u32 frequency)//绝对定位函数
 			motor_dir=CW;//顺时针
 		else
 			motor_dir=CCW;//逆时针
-		DRIVER_DIR1=motor_dir;//设置方向
-		DRIVER_DIR2=~DRIVER_DIR1;
+		DRIVER_DIR2=motor_dir;//设置方向
+		DRIVER_DIR1=~DRIVER_DIR2;
 		
 		rcr_integer=abs(target_pos-current_pos)/(RCR_VAL+1);//重复计数整数部分
 		rcr_remainder=abs(target_pos-current_pos)%(RCR_VAL+1);//重复计数余数部分

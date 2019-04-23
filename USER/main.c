@@ -17,13 +17,13 @@ int main(void)
 	u8 temp=0;int i=0;
 	u32 delay=0;//用于串口延时发送；
 	u8 keyval;//按键检测
-	long long count1=0;//计数值
-	long long count2=0;//计数值
-	long long count3=0;//计数值
-	long long count4=0;//计数值
+	u16 count1=0;//计数值
+	u16 count2=0;//计数值
+	u16 count3=0;//计数值
+	u16 count4=0;//计数值
 	int pst=0,pst_old=0;
 	float	k1,k2,k3;//捕获转换系数
-	k1=(float)(500-0)/(float)(215-87);//捕获的测量值是87~215，标定到0~500
+	k1=(float)(500-0)/(float)(216-87);//捕获的测量值是87~215，标定到0~500
 	k2=(float)45000/(float)(21-15);
 	k3=(float)45000/(float)(15-8);
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);//设置系统中断优先级分组2
@@ -46,7 +46,7 @@ int main(void)
 #if 1	
    while(1) 
 	{
- 		delay_ms(10);
+ 		//delay_ms(10);
 		
 #if 1    //PC端串口调试程序
 		temp= RxProcess();
@@ -68,7 +68,7 @@ int main(void)
 		count4=tim4up4/10;
 		
 		
-	//printf("HIGH:%lld us\r\n",count1); 
+		//printf("HIGH:%lld us\r\n",count1); 
 		//printf("DIR: %lld \n",count2);
 		//printf("DIR: %lld \n",count3);
 	
@@ -77,7 +77,9 @@ int main(void)
 		//count1=count1/10;//
 		if(count1<300)
 		{
+			//printf("HIGH:%d us\r\n",tim4up1); 
 			count1=500-(int)(k1*(count1-87));//标定到（500，0）区间
+			//printf("duty:%d \r\n",count1); 
 			TIM_SetCompare1(TIM5,count1);
 			TIM_SetCompare2(TIM5,count1);
 			TIM_SetCompare3(TIM5,count1);
@@ -140,15 +142,15 @@ int main(void)
 	
 #endif
 		
-#if 0 //速度反馈程序
+#if 1 //速度反馈程序
 		delay ++;
-		if(delay == 100)
+		if(delay == 5)
 		{
 			delay=0;
-			printf("[ motor 1: %d rpm ]  ",f1);
-			printf("[ motor 2: %d rpm ] \n",f2);
-			printf("[ motor 3: %d hz ]  ",f3);
-			printf("[ motor 4: %d hz ]\r\n",f4);
+			printf("[ motor 1: %d hz ]  ",f1);
+			printf("[ motor 2: %d hz ] \n",f2);
+			printf("[ motor 3: %d us ]  ",f3);
+			printf("[ motor 4: %d us ]\r\n",f4);
 		}
 #endif
 		keyval=KEY_Scan(0);
