@@ -31,10 +31,10 @@
 - 函数功能
   - `void TIM4_Cap_Init(u32 arr,u16 psc);` 初始化TIM4四通道捕获输入
 
-## 遥控功能
+## 遥控功能（controler_logic)
 - `void RemoteControler()` 遥控判断
 
-## 速度反馈
+## 速度反馈(spdfb.c)
 
-## CAN总线通信 
+## CAN总线通信 (can.c)
 
