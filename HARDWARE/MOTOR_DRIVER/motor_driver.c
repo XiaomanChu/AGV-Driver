@@ -1,7 +1,37 @@
-#include "pwm.h"
-#include "motor_driver.h"
+#include "motor_driver.h" 
+#include "steering_driver.h"
+#include "math.h"
 #include "usart.h"
+#define PI 3.1416
+
+//PB0,PB1为电机转向控制,高电平为正转
+//PA0为电机使能信号,高电平使能
+//LED IO初始化
+void IO_Init(void)
+{    	 
+  GPIO_InitTypeDef  GPIO_InitStructure;
+	
  
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOH, ENABLE);//使能GPIO时钟
+  //GPIOF9,F10初始化设置
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9|GPIO_Pin_14|GPIO_Pin_15|GPIO_Pin_13;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;//普通输出模式
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;//推挽输出
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;//100MHz
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;//上拉
+	GPIO_Init(GPIOH, &GPIO_InitStructure);
+	
+	
+	GPIO_ResetBits(GPIOH,GPIO_Pin_15);//使能信号EN默认高电平/不使能
+  GPIO_ResetBits(GPIOH,GPIO_Pin_9);				//方向正转
+	GPIO_ResetBits(GPIOH,GPIO_Pin_14);					//方向正转
+	GPIO_SetBits(GPIOH,GPIO_Pin_13);		//刹车信号
+	GPIO_SetBits(GPIOB,GPIO_Pin_0|GPIO_Pin_1);//默认左右都是正转
+
+
+	
+}
+
 //TIM5 PWM部分初始化 
 //PH10~12,PA3对应TIM5CH1~4通道输出
 //PWM输出初始化
@@ -65,5 +95,65 @@ void PWMInit(u32 arr,u32 psc)
  
 										  
 }  
+
+//电机占空比设定
+void SetMotorPWM(u8 flag,u32 arry)
+{
+			double	alpha;//当前转向角
+			u32 duty= arry;
+			
+			if(flag== Right){//右转
+				alpha = abs(current_pos)*0.00063;//每个脉冲转角约为0.00063度
+				duty=Diff_Calculation(alpha)*arry; //正常占空系数*内外圈速度比例
+				TIM_SetCompare1(TIM5,duty);
+				TIM_SetCompare2(TIM5,duty);
+			}
+			else if(flag== Left){//左转
+				alpha = abs(current_pos)*0.00063;//每个脉冲转角约为0.00063度
+				duty=Diff_Calculation(alpha)*arry; //正常占空系数*内外圈速度比例
+				TIM_SetCompare3(TIM5,duty);
+				TIM_SetCompare4(TIM5,duty);
+				//printf("diff: %d \r\n",duty);
+			}
+			else//正常前进，无需差速
+			{
+				TIM_SetCompare1(TIM5,duty);
+				TIM_SetCompare2(TIM5,duty);
+				TIM_SetCompare3(TIM5,duty);
+				TIM_SetCompare4(TIM5,duty);
+			}
+}
+
+//电机状态控制
+void Motor_Status_Setup(u8 en,u8 dir,u8 bk,u32 speed)
+{
+	if(en == MotorEnable)GPIO_SetBits(GPIOH,GPIO_Pin_15);//使能信号EN默认高电平/不使能
+	else GPIO_ResetBits(GPIOH,GPIO_Pin_15);
+  GPIO_ResetBits(GPIOH,GPIO_Pin_9);				//方向正转
+	GPIO_ResetBits(GPIOH,GPIO_Pin_14);					//方向正转
+	GPIO_SetBits(GPIOH,GPIO_Pin_13);		//刹车信号
+	
+}
+
+
+//差速比例计算 
+double Diff_Calculation(double alpha)
+{
+	double la,lb; 
+	double diff;
+	double si =sin(alpha*3.1416/180);
+	la = 7.0/18.0 * 3.1416* alpha / si;//内圈,路程小
+	//diff = 20.0;//固定差速
+	diff = 0.0018*pow(alpha,3) - 0.0395*pow(alpha,2)+0.3532*alpha-0.0238;
+	alpha+=diff;
+	si =sin(alpha*3.1416/180);
+	lb = 7.0/18.0 * PI*alpha / si;//外圈，路程大
+	return lb/la;
+	
+	
+	
+}
+
+
 
 

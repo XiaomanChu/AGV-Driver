@@ -1,22 +1,8 @@
-#include "driver.h"
+#include "steering_driver.h"
 #include "delay.h"
 #include "usart.h"
 
-//////////////////////////////////////////////////////////////////////////////////	 
-//本程序只供学习使用，未经作者许可，不得用于其它任何用途
-//此例程有参考论坛网友例程的一部分(http://www.openedv.com/thread-41832-1-1.html)
-//ALIENTEK STM32F407开发板
-//步进电机驱动器 测试代码			   
-//lycreturn@ALIENTEK
-//技术论坛:www.openedv.com
-//修改日期:2016/05/12
-//版本：V1.0
-//版权所有，盗版必究。
-//Copyright(C) 广州市星翼电子科技有限公司 2009-2019
-//All rights reserved	
-//********************************************************************************
-//修改日期:2016/05/12
-//////////////////////////////////////////////////////////////////////////////////
+
 /********** 驱动器 端口定义 **************
 //DRIVER_DIR1   PD7 默认高，正转
 //DRIVER_DIR2   PF11 默认高，正转
@@ -214,8 +200,8 @@ void Locate_Abs(long num,u32 frequency)//绝对定位函数
 	if(TIM8->CR1&0x01)//上一次脉冲还未发送完成 终止定时器 计算更新当前位置
 	{
 		
-		TIM_Cmd(TIM8, DISABLE);
-		delay_ms(100);
+		TIM_Cmd(TIM8, DISABLE);//定时器停止
+		delay_ms(60);//如果转向步进电机存在颤抖，调大延时，但过高的延时会导致电机转向修正时有顿挫感
 		rcrval=TIM8->RCR;
 		if(motor_dir==CCW)current_pos=target_pos+(rcr_integer*(RCR_VAL+1)+rcr_remainder+rcrval);
 		else current_pos=target_pos-(rcr_integer*(RCR_VAL+1)+rcr_remainder+rcrval);
@@ -223,7 +209,7 @@ void Locate_Abs(long num,u32 frequency)//绝对定位函数
 	}
 	if((frequency<20)||(frequency>100000))//脉冲频率不在范围内 直接返回
 	{
-		printf("\r\nThe frequency is out of range! please reset it!!(range:20Hz~100KHz)\r\n");
+		//printf("\r\nThe frequency is out of range! please reset it!!(range:20Hz~100KHz)\r\n");
 		return;
 	}
 	target_pos=num;//设置目标位置
