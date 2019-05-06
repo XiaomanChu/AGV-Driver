@@ -5,7 +5,7 @@
   - PH15 为电机使能信号,低电平使能
   - PH13 为刹车信号 低电平刹车
 - stm32 TIM5 1khz PWM
-  - PH10~12,PA3对应TIM5CH1~4通道输出
+  - PH10-12、PA3对应TIM5CH1~4通道输出
 - 函数功能
   - `void IO_Init(void);` GPIO初始化
   - `void PWMInit(u32 arr,u32 psc);` 定时器PWM初始化
