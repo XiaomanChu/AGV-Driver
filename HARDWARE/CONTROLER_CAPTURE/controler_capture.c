@@ -1,6 +1,6 @@
 #include "pwm.h"
 #include "usart.h"
-#include "capture.h"
+#include "controler_capture.h"
 TIM_ICInitTypeDef  TIM4_ICInitStructure;
 
 
@@ -113,7 +113,7 @@ void TIM4_Cap_Init(u32 arr,u16 psc)
 //[6]:0,还没捕获到低电平;1,已经捕获到低电平了.
 //[5:0]:捕获低电平后溢出的次数(对于32位定时器来说,1us计数器加1,溢出时间:4294秒)
 
-//定时器5中断服务程序	 
+//定时器4中断服务程序	 
 void TIM4_IRQHandler(void)
 { 		    
 

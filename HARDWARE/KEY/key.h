@@ -15,10 +15,10 @@
 ////////////////////////////////////////////////////////////////////////////////// 	 
 
 /*下面的方式是通过直接操作库函数方式读取IO*/
-#define KEY0 		GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_0) //PE4
-#define KEY1 		GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_1)	//PE3 
-#define KEY2 		GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_2) //PE2
-#define KEY3 	GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_3)	//PE4
+#define KEY1 		GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_0) //PE0
+#define KEY2 		GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_1)	//PE1 
+#define KEY3 		GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_2) //PE2
+#define KEY4 	GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_3)	//PE3
 
 
 /*下面方式是通过位带操作方式读取IO*/
@@ -30,10 +30,10 @@
 */
 
 
-#define KEY0_PRES 	1
-#define KEY1_PRES		2
-#define KEY2_PRES		3
-#define KEY3_PRES   4
+#define KEY1_PRES 	1
+#define KEY2_PRES		2
+#define KEY3_PRES		3
+#define KEY4_PRES   4
 
 void KEY_Init(void);	//IO初始化
 u8 KEY_Scan(u8);  		//按键扫描函数	
