@@ -4,7 +4,7 @@
 #include "steering_driver.h"
 
 
-u32 count1=0;//计数值
+u32 count1=0;//遥控器脉宽计数值
 u32 count2=0;//计数值
 u32 count3=0;//计数值
 u32 count4=0;//计数值
@@ -13,6 +13,7 @@ u8 dir=0;
 float	k1,k_right,k_left;//捕获转换系数
 u32 delay=0;//用于串口延时发送；
 u32 dir_delay;//用于转向延时
+
 
 void RemoteControler() //遥控程序
 {
@@ -33,33 +34,33 @@ void RemoteControler() //遥控程序
 	
 		//将捕获计数转换成PWM电机控制
 		//count1=count1/10;//
-		if(count1<300)
+		if(count1<300&count1>85)
 		{
 			//printf("HIGH:%d us\r\n",tim4up1); 
 			count1=500-(int)(k1*(count1-87));//标定到（500，0）区间
 			//printf("duty:%d \r\n",count1); 
 			SetMotorPWM(dir,count1);
 		}
-		if(count2<109)
+		if(count2<109&&count2>85)
 		{
-			GPIO_SetBits(GPIOH,GPIO_Pin_9);//正转
-			GPIO_ResetBits(GPIOH,GPIO_Pin_14);
-			GPIO_SetBits(GPIOH,GPIO_Pin_13);//不刹车
-			GPIO_SetBits(GPIOH,GPIO_Pin_15);//电机使
+			Motor_StatusInit.enable=MotorEnable;
+			Motor_StatusInit.dir=FORWARD;  //前进
+			Motor_StatusInit.Break=NoBREAK;
+			Motor_Status_Setup(&Motor_StatusInit);
 	
 		}
 		else if(count2>190&&count2<300)
 		{
-			GPIO_ResetBits(GPIOH,GPIO_Pin_9);//反转
-			GPIO_SetBits(GPIOH,GPIO_Pin_14);
-			GPIO_SetBits(GPIOH,GPIO_Pin_13);//不刹车
-			GPIO_SetBits(GPIOH,GPIO_Pin_15);//电机使
+			Motor_StatusInit.enable=MotorEnable;
+			Motor_StatusInit.dir=BACKWARD;   //后退
+			Motor_StatusInit.Break=NoBREAK;
+			Motor_Status_Setup(&Motor_StatusInit);
 			
 		}
 		else if(count2>140&&count2<160) 
 		{
-			 GPIO_ResetBits(GPIOH,GPIO_Pin_15);//关闭使能
-			
+			Motor_StatusInit.enable=MotorDisable;
+			Motor_Status_Setup(&Motor_StatusInit);//使能关闭
 		}
 		
 		pst=count3/10;  //将遥控器输入标定到(8,21)

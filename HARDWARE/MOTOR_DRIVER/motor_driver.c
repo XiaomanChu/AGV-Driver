@@ -4,14 +4,17 @@
 #include "usart.h"
 #define PI 3.1416
 
-//PB0,PB1为电机转向控制,高电平为正转
-//PA0为电机使能信号,高电平使能
-//LED IO初始化
-void IO_Init(void)
-{    	 
+//PH9,PH14为电机转向控制,低电平为正转
+//PH15 为电机使能信号,低电平使能
+//PH13 为刹车信号 低电平刹车
+
+Motor_StatusDef Motor_StatusInit;//电机状态设定结构体
+
+void Motor_Init(void)
+{   
+	//IO初始化
   GPIO_InitTypeDef  GPIO_InitStructure;
-	
- 
+
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOH, ENABLE);//使能GPIO时钟
   //GPIOF9,F10初始化设置
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9|GPIO_Pin_14|GPIO_Pin_15|GPIO_Pin_13;
@@ -21,12 +24,18 @@ void IO_Init(void)
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;//上拉
 	GPIO_Init(GPIOH, &GPIO_InitStructure);
 	
+	//电机状态初始化
+	Motor_StatusInit.enable= MotorDisable;
+	Motor_StatusInit.dir = FORWARD;
+	Motor_StatusInit.Break = NoBREAK;
+	Motor_StatusInit.Acceleration=0;
 	
-	GPIO_ResetBits(GPIOH,GPIO_Pin_15);//使能信号EN默认高电平/不使能
-  GPIO_ResetBits(GPIOH,GPIO_Pin_9);				//方向正转
-	GPIO_ResetBits(GPIOH,GPIO_Pin_14);					//方向正转
-	GPIO_SetBits(GPIOH,GPIO_Pin_13);		//刹车信号
-	GPIO_SetBits(GPIOB,GPIO_Pin_0|GPIO_Pin_1);//默认左右都是正转
+	Motor_Status_Setup(&Motor_StatusInit);
+	
+//	GPIO_ResetBits(GPIOH,GPIO_Pin_15);//使能信号EN默认低电平/使能
+//  GPIO_SetBits(GPIOH,GPIO_Pin_9);				//方向正转
+//	GPIO_ResetBits(GPIOH,GPIO_Pin_14);			//方向正转
+//	GPIO_SetBits(GPIOH,GPIO_Pin_13);		//刹车信号，不刹车
 
 
 	
@@ -125,13 +134,25 @@ void SetMotorPWM(u8 flag,u32 arry)
 }
 
 //电机状态控制
-void Motor_Status_Setup(u8 en,u8 dir,u8 bk,u32 speed)
+void Motor_Status_Setup(Motor_StatusDef* StatusSetup)
 {
-	if(en == MotorEnable)GPIO_SetBits(GPIOH,GPIO_Pin_15);//使能信号EN默认高电平/不使能
-	else GPIO_ResetBits(GPIOH,GPIO_Pin_15);
-  GPIO_ResetBits(GPIOH,GPIO_Pin_9);				//方向正转
-	GPIO_ResetBits(GPIOH,GPIO_Pin_14);					//方向正转
-	GPIO_SetBits(GPIOH,GPIO_Pin_13);		//刹车信号
+	if(StatusSetup->enable==MotorDisable)GPIO_ResetBits(GPIOH,GPIO_Pin_15);//使能信号EN默认低电平/不使能
+	else if (StatusSetup->enable==MotorEnable)GPIO_SetBits(GPIOH,GPIO_Pin_15);//使能
+	
+	if(StatusSetup->Break==NoBREAK)GPIO_SetBits(GPIOH,GPIO_Pin_13);	//不刹车
+	else GPIO_ResetBits(GPIOH,GPIO_Pin_13);//刹车
+	
+	if(StatusSetup->dir==FORWARD){
+		GPIO_SetBits(GPIOH,GPIO_Pin_9);				//方向正转
+		GPIO_ResetBits(GPIOH,GPIO_Pin_14);					//方向正转
+	}
+	else{
+		GPIO_ResetBits(GPIOH,GPIO_Pin_9);				//方向反转
+		GPIO_SetBits(GPIOH,GPIO_Pin_14);					//方向反转
+	}
+	
+	//加速度设定待写
+
 	
 }
 

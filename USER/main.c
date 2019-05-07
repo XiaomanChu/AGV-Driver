@@ -4,7 +4,7 @@
 #include "motor_driver.h"
 #include "controler_capture.h"
 #include "controler_logic.h"
-#include	"steering_driver.h"
+#include "steering_driver.h"
 //#include	"SpdCap.h"
 #include "key.h"
 
@@ -24,7 +24,7 @@ int main(void)
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);//设置系统中断优先级分组2
 	delay_init(168);  //初始化延时函数
 	uart_init(115200);//初始化串口波特率为115200
-	IO_Init();
+	Motor_Init();
  	PWMInit(500-1,84-1);	//84M/84=1Mhz的计数频率,重装载值500，所以PWM频率为 1M/500=2Khz.  
   SetMotorPWM(0,500);//500对应0占空比
 	KEY_Init();					//按键初始化

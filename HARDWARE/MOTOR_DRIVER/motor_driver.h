@@ -16,25 +16,39 @@
 ////////////////////////////////////////////////////////////////////////////////// 	
 
 
-//LED端口定义
+//端口定义
 #define LED0 PFout(9)	// DS0
-#define LED1 PFout(10)	// DS1	 
-#define FORWARD 1
-#define BACK 	0
-#define MotorEnable 1
-#define MotorDisable 0
-#define BREAK 1
-#define NoBREAK	0
+#define LED1 PFout(10)	// DS1	
+
+//状态定义
+#define FORWARD True
+#define BACKWARD 	False
+#define MotorEnable True
+#define MotorDisable False
+#define BREAK False
+#define NoBREAK	True
 
 #define Right 1
 #define Left 2
 #define Advance 0
 
-void IO_Init(void);//初始化	
+typedef enum{
+	True = 1,
+	False = 0
+}bool;
+
+typedef	struct{
+	bool enable;
+	bool dir;
+	bool Break;
+	u32 Acceleration;
+}Motor_StatusDef;//电机状态定义
+
+void Motor_Init(void);//初始化	
 void PWMInit(u32 arr,u32 psc);
 void SetMotorPWM(u8 flag,u32 arry);
-void Motor_Status_Setup(u8 en,u8 dir,u8 bk,u32 speed);
+void Motor_Status_Setup(Motor_StatusDef* StatusSetup);
 
 extern double Diff_Calculation(double alpha);
-
+extern Motor_StatusDef Motor_StatusInit;
 #endif
