@@ -34,7 +34,14 @@
 ## 遥控功能（controler_logic)
 - `void RemoteControler()` 遥控判断
 
-## 速度反馈(spdfb.c)
-
+## 速度反馈(SpdCap.c)
+- 电机驱动速度反馈信号为5V方波脉冲，0速时高电平5V，速度越快频率越高
+  - 频率大概在50Hz~600Hz，采用IO下降沿中断，光耦隔离
+  - 定时器TIM3溢出中断 用于计时，溢出时间100us
+-函数功能
+  - `void TIM3_Cap_Init(u16 arr, u16 psc)` 外部中断初始化、定时器初始化
+  - `u32 Speed_Cal(u32 time)` 用于将脉冲时间转换为速度
+  - `void TIM3_IRQHandler(void)` 定时器溢出中断函数
+  - `void EXTI0_IRQHandler(void)` 外部触发中断函数
 ## CAN总线通信 (can.c)
 
