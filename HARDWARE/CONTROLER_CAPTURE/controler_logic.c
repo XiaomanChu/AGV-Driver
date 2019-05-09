@@ -63,15 +63,15 @@ void RemoteControler() //遥控程序
 			Motor_Status_Setup(&Motor_StatusInit);//使能关闭
 		}
 		
-		pst=count3/10;  //将遥控器输入标定到(8,21)
+		pst=count4/10;  //将遥控器输入标定到(8,21)
 		if(pst<300&&pst!=pst_old)//遥控方向有变化
 		{
 			dir_delay ++;
 			if(dir_delay==5000)//延时，防止频繁转动
 			{
+				dir_delay=0;
 				if(pst!=pst_old)
 				{
-					dir_delay=0;
 					if(pst>15&&pst<30&&pst!=pst_old)//右转
 					{
 						pst_old=pst;

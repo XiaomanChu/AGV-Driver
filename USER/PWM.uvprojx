@@ -413,11 +413,6 @@
               <FilePath>..\HARDWARE\SPDCAP\SpdCap.c</FilePath>
             </File>
             <File>
-              <FileName>spdfb.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\SPDFB\spdfb.c</FilePath>
-            </File>
-            <File>
               <FileName>motor_driver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\MOTOR_DRIVER\motor_driver.c</FilePath>
@@ -501,6 +496,11 @@
               <FileName>stm32f4xx_rcc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FWLIB\src\stm32f4xx_rcc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_exti.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FWLIB\src\stm32f4xx_exti.c</FilePath>
             </File>
           </Files>
         </Group>

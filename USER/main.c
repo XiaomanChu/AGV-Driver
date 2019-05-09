@@ -5,7 +5,7 @@
 #include "controler_capture.h"
 #include "controler_logic.h"
 #include "steering_driver.h"
-//#include	"SpdCap.h"
+#include	"SpdCap.h"
 #include "key.h"
 
 //#include "usmart.h"
@@ -28,8 +28,8 @@ int main(void)
  	PWMInit(500-1,84-1);	//84M/84=1Mhz的计数频率,重装载值500，所以PWM频率为 1M/500=2Khz.  
   SetMotorPWM(0,500);//500对应0占空比
 	KEY_Init();					//按键初始化
-	TIM4_Cap_Init(0XFFFF,84-1); //以1Mhz的频率计数 ，溢出时间65535us,遥控器接收器最长脉宽2160us
-//  TIM3_Cap_Init(0xffff,84-1); //以1Mhz的频率计
+	TIM4_Cap_Init(0XFFFF,84-1); //以1Mhz的频率计数 ，溢出时间65536us,遥控器接收器最长脉宽2160us
+  TIM3_Cap_Init(0x63,84-1); //以1Mhz的频率计，溢出时间100us
 	
 	Driver_Init();			//步进电机驱动器初始化
 	TIM8_OPM_RCR_Init(999,168-1); //TIM8为168MHz所以是1MHz计数频率  单脉冲+重复计数模式  
@@ -51,7 +51,7 @@ int main(void)
 		
 		//遥控程序
 		RemoteControler();
-	
+		//printf("motor 1: hz \r\n");
 		//速度反馈程序
 		//delay = SpeedFeedback(delay);
 
@@ -60,13 +60,14 @@ int main(void)
 		keyval=KEY_Scan(0);
 		if(keyval==KEY3_PRES)
 		{
+			printf("hello \r\n");
 			Locate_Abs(0,7000);//按下KEY3，回零点
 		}else if(keyval==KEY1_PRES)
 		{
-			Locate_Rle(1000,7000,CW);//按下KEY1，以7000Hz的频率 顺时针发1000脉冲, 
+			Locate_Rle(1000,7500,CW);//按下KEY1，以7000Hz的频率 顺时针发1000脉冲, 
 		}else if(keyval==KEY2_PRES)
 		{
-			Locate_Rle(1000,7000,CCW);//按下KEY2，以7000Hz的频率 逆时针发1000脉冲
+			Locate_Rle(1000,7500,CCW);//按下KEY2，以7000Hz的频率 逆时针发1000脉冲
 		}			
 		
 	
@@ -76,7 +77,7 @@ int main(void)
 }
 
 //void SetMotorPWM(u32 arry)
-//{
+//{   
 //			double	alpha;//当前转向角
 //			u32 duty= arry;
 //			
