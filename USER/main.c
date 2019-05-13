@@ -7,6 +7,7 @@
 #include "steering_driver.h"
 #include	"SpdCap.h"
 #include "key.h"
+#include "can.h"
 
 //#include "usmart.h"
 
@@ -20,10 +21,14 @@ int main(void)
 	//u8 temp=0;int i=0;
 
 	u8 keyval;//按键检测
-
+	u8 CanRxBuf[8];//can总线接受数据
+	u8 CanTxBuf[7];//can总线发送数据
+	u8 CanT_Flag;
+	u8 CanR_Flag;
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);//设置系统中断优先级分组2
 	delay_init(168);  //初始化延时函数
 	uart_init(115200);//初始化串口波特率为115200
+	CAN1_Mode_Init(CAN_SJW_1tq,CAN_BS2_6tq,CAN_BS1_7tq,6,CAN_Mode_LoopBack);//CAN初始化环回模式,波特率500Kbps    
 	Motor_Init();
  	PWMInit(500-1,84-1);	//84M/84=1Mhz的计数频率,重装载值500，所以PWM频率为 1M/500=2Khz.  
   SetMotorPWM(0,500);//500对应0占空比
@@ -60,16 +65,32 @@ int main(void)
 		keyval=KEY_Scan(0);
 		if(keyval==KEY3_PRES)
 		{
-			printf("hello \r\n");
-			Locate_Abs(0,7000);//按下KEY3，回零点
+					//printf("key4 pressed\r\n");
+			for(int i=0;i<8;i++)
+			{
+				CanTxBuf[i]=0xFF;
+			}
+			CanT_Flag=CAN1_Send_Msg(CanTxBuf,8);
+			if(!CanT_Flag)printf("Transction Success\r\n" );
+			else printf("Transction Failed\r\n");
+			//Locate_Abs(0,7000);//按下KEY3，回零点
 		}else if(keyval==KEY1_PRES)
 		{
 			Locate_Rle(1000,7500,CW);//按下KEY1，以7000Hz的频率 顺时针发1000脉冲, 
 		}else if(keyval==KEY2_PRES)
 		{
 			Locate_Rle(1000,7500,CCW);//按下KEY2，以7000Hz的频率 逆时针发1000脉冲
-		}			
-		
+		}else if(keyval==KEY4_PRES)
+		{
+	
+		}				
+		CanR_Flag = CAN1_Receive_Msg(CanRxBuf);
+		if(CanR_Flag)
+		{
+			for(int i=0;i<8;i++)
+			printf("Receive %d \r\n",CanRxBuf[i]);
+		}
+			
 	
 
 	
