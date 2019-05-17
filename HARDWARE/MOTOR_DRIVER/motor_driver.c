@@ -1,3 +1,13 @@
+/************************************************************************
+*此部分程序为AGV行走直流电机驱动程序，配合相关驱动器
+*采用TIM5 PWM输出
+*程序对外输出变量：
+*				extern double Diff_Calculation(double alpha);//左右差速计算
+*				extern Motor_StatusDef Motor_StatusInit;//电机状态结构体
+*************************************************************************/
+
+
+
 #include "motor_driver.h" 
 #include "steering_driver.h"
 #include "math.h"
@@ -106,22 +116,26 @@ void PWMInit(u32 arr,u32 psc)
 }  
 
 //电机占空比设定
-void SetMotorPWM(u8 flag,u32 arry)
+//falg：方向，percent：速度百分比0~100
+void SetMotorPWM(u8 flag,u32 percent)
 {
+			
 			double	alpha;//当前转向角
-			u32 duty= arry;
+	if(percent<=100)
+	{
+			u32 duty= 500-5*percent;//改成（500~0）区间
 			
 			if(flag== Right){//右转
 				alpha = abs(current_pos)*0.00063;//每个脉冲转角约为0.00063度
-				duty=Diff_Calculation(alpha)*arry; //正常占空系数*内外圈速度比例
-				TIM_SetCompare1(TIM5,duty);
-				TIM_SetCompare2(TIM5,duty);
+				duty=Diff_Calculation(alpha)*percent; //正常占空系数*内外圈速度比例
+				TIM_SetCompare3(TIM5,duty);//左边加速
+				TIM_SetCompare4(TIM5,duty);
 			}
 			else if(flag== Left){//左转
 				alpha = abs(current_pos)*0.00063;//每个脉冲转角约为0.00063度
-				duty=Diff_Calculation(alpha)*arry; //正常占空系数*内外圈速度比例
-				TIM_SetCompare3(TIM5,duty);
-				TIM_SetCompare4(TIM5,duty);
+				duty=Diff_Calculation(alpha)*percent; //正常占空系数*内外圈速度比例
+				TIM_SetCompare1(TIM5,duty);//右边加速
+				TIM_SetCompare2(TIM5,duty);
 				//printf("diff: %d \r\n",duty);
 			}
 			else//正常前进，无需差速
@@ -131,6 +145,7 @@ void SetMotorPWM(u8 flag,u32 arry)
 				TIM_SetCompare3(TIM5,duty);
 				TIM_SetCompare4(TIM5,duty);
 			}
+		}
 }
 
 //电机状态控制

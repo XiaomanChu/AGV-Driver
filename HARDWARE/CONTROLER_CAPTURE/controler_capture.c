@@ -1,8 +1,23 @@
+/************************************************************************************
+*此部分代码为 WFLY ET07 遥控器接收机PWM输出捕获程序，
+*捕获PWM为50hz，脉宽约为1520us~2160us
+*采用定时器TIM4四路通道捕获
+*单片机引脚复用引脚为：GPIOD12, 13, 14, 15
+*
+*程序对外输出变量：
+*					u32 tim4up1 	//捕获脉冲高电平的时间
+*					u32 tim4up2 	
+*					u32 tim4up3 	
+*					u32 tim4up4 	
+*
+*************************************************************************************/
+
 #include "pwm.h"
 #include "usart.h"
 #include "controler_capture.h"
-TIM_ICInitTypeDef  TIM4_ICInitStructure;
 
+
+TIM_ICInitTypeDef  TIM4_ICInitStructure;
 
 u8 TIM4CH1_CAPTURE_STA = 0;	//通道1输入捕获标志，高两位做捕获标志，低6位做溢出标志		
 u16 TIM4CH1_CAPTURE_UPVAL;
@@ -20,10 +35,10 @@ u8 TIM4CH4_CAPTURE_STA = 0;	//通道4输入捕获标志，高两位做捕获标志，低6位做溢出标
 u16 TIM4CH4_CAPTURE_UPVAL;
 u16 TIM4CH4_CAPTURE_DOWNVAL; 
 
-u32 tim4up1 = 0;	//捕获总高电平的时间
-u32 tim4up2 = 0;	//捕获总高电平的时间
-u32 tim4up3 = 0;	//捕获总高电平的时间
-u32 tim4up4 = 0;	//捕获总高电平的时间
+u32 tim4up1 = 0;	//捕获脉冲高电平的时间
+u32 tim4up2 = 0;	//捕获脉冲高电平的时间
+u32 tim4up3 = 0;	//捕获脉冲高电平的时间
+u32 tim4up4 = 0;	//捕获脉冲高电平的时间
 
 u32 tim4_T1;//作为溢出情况下的补差值
 u32 tim4_T2;

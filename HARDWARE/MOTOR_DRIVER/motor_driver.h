@@ -21,12 +21,12 @@
 #define LED1 PFout(10)	// DS1	
 
 //状态定义
-#define FORWARD True
-#define BACKWARD 	False
-#define MotorEnable True
-#define MotorDisable False
-#define BREAK False
-#define NoBREAK	True
+#define FORWARD ENABLE
+#define BACKWARD 	DISABLE
+#define MotorEnable ENABLE
+#define MotorDisable DISABLE
+#define BREAK ENABLE
+#define NoBREAK	DISABLE
 
 #define Right 1
 #define Left 2
@@ -38,9 +38,9 @@ typedef enum{
 }bool;
 
 typedef	struct{
-	bool enable;
-	bool dir;
-	bool Break;
+	FunctionalState enable;
+	FunctionalState dir;
+	FunctionalState Break;
 	u32 Acceleration;
 }Motor_StatusDef;//电机状态定义
 

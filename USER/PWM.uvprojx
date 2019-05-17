@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F40_41xxx,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\CORE;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\USER;..\HARDWARE\PWM;..\FWLIB\inc;..\HARDWARE\MOTOR_DRIVER;..\HARDWARE\KEY;..\HARDWARE\STEER_DRIVER;..\HARDWARE\CONTROLER_CAPTURE;..\USMART;..\HARDWARE\SPDCAP;..\HARDWARE\SPDFB</IncludePath>
+              <IncludePath>..\CORE;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\USER;..\HARDWARE\PWM;..\FWLIB\inc;..\HARDWARE\MOTOR_DRIVER;..\HARDWARE\KEY;..\HARDWARE\STEER_DRIVER;..\HARDWARE\CONTROLER_CAPTURE;..\USMART;..\HARDWARE\SPDCAP;..\HARDWARE\SPDFB;..\HARDWARE\CAN</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -432,6 +432,11 @@
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\CONTROLER_CAPTURE\controler_logic.c</FilePath>
             </File>
+            <File>
+              <FileName>can.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\CAN\can.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -501,6 +506,11 @@
               <FileName>stm32f4xx_exti.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FWLIB\src\stm32f4xx_exti.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_can.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FWLIB\src\stm32f4xx_can.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -1,3 +1,10 @@
+/*****************************************
+*此部分代码为AGV小车转向步进电机驱动程序
+*配套步进电机驱动器
+*主要函数：
+*					void Locate_Abs(long num,u32 frequency)//绝对定位函数
+*					void Locate_Rle(long num,u32 frequency,DIR_Type dir) //相对定位函数
+********************************************/
 #include "steering_driver.h"
 #include "delay.h"
 #include "usart.h"
@@ -191,7 +198,7 @@ void Locate_Rle(long num,u32 frequency,DIR_Type dir) //相对定位函数
 	
 }
 /********************************************
-//绝对定位函数 
+//步进电机驱动器绝对定位函数 
 //num   -2147483648～2147483647
 //frequency: 20Hz~100KHz
 *********************************************/

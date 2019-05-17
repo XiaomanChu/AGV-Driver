@@ -9,53 +9,43 @@
 #include "key.h"
 #include "can.h"
 
-//#include "usmart.h"
 
-u8 RxProcess(void);//串口数据处理
-void TxProcess(u8 sendData);//串口数据发送
-//void SetMotorPWM(u32 arry);
-//void RemoteControler(void);
+//u8 RxProcess(void);//串口数据处理
+//void TxProcess(u8 sendData);//串口数据发送
+
 
 int main(void)
 {  
-	//u8 temp=0;int i=0;
-
 	u8 keyval;//按键检测
-	u8 CanRxBuf[8];//can总线接受数据
+	//u8 CanRxBuf[8];//can总线接受数据
 	u8 CanTxBuf[7];//can总线发送数据
 	u8 CanT_Flag;
 	u8 CanR_Flag;
+	
+	//各种初始化程序
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);//设置系统中断优先级分组2
 	delay_init(168);  //初始化延时函数
 	uart_init(115200);//初始化串口波特率为115200
-	CAN1_Mode_Init(CAN_SJW_1tq,CAN_BS2_6tq,CAN_BS1_7tq,6,CAN_Mode_LoopBack);//CAN初始化环回模式,波特率500Kbps    
-	Motor_Init();
+	CAN1_Mode_Init(CAN_SJW_1tq,CAN_BS2_6tq,CAN_BS1_7tq,6,CAN_Mode_Normal);//CAN初始化环回模式（CAN_Mode_LoopBack）,（普通模式：CAN_Mode_Normal）波特率500Kbps   
+	Motor_Init();//行走电机驱动初始化
  	PWMInit(500-1,84-1);	//84M/84=1Mhz的计数频率,重装载值500，所以PWM频率为 1M/500=2Khz.  
-  SetMotorPWM(0,500);//500对应0占空比
+  SetMotorPWM(0,0);//速度初始0
 	KEY_Init();					//按键初始化
 	TIM4_Cap_Init(0XFFFF,84-1); //以1Mhz的频率计数 ，溢出时间65536us,遥控器接收器最长脉宽2160us
   TIM3_Cap_Init(0x63,84-1); //以1Mhz的频率计，溢出时间100us
-	
 	Driver_Init();			//步进电机驱动器初始化
 	TIM8_OPM_RCR_Init(999,168-1); //TIM8为168MHz所以是1MHz计数频率  单脉冲+重复计数模式  
 
+	//主循环
    while(1) 
 	{
  		//delay_ms(10);
 		
-#if 0    //PC端串口调试程序
-		temp= RxProcess();
-		if(USART_RX_BUF[0]!=0)printf("电机速率:%d\r\n",100-temp);
-		//清除串口数据,准备下一次接收
-		for(i=0;i<USART_RX_STA;i++)
-		{
-			USART_RX_BUF[i]=0;
-		}
-		USART_RX_STA=0;
-#endif
-		
+
+
+
 		//遥控程序
-		RemoteControler();
+		if(Controler_ENABLE)RemoteControler();
 		//printf("motor 1: hz \r\n");
 		//速度反馈程序
 		//delay = SpeedFeedback(delay);
@@ -68,7 +58,7 @@ int main(void)
 					//printf("key4 pressed\r\n");
 			for(int i=0;i<8;i++)
 			{
-				CanTxBuf[i]=0xFF;
+				CanTxBuf[i]=i;
 			}
 			CanT_Flag=CAN1_Send_Msg(CanTxBuf,8);
 			if(!CanT_Flag)printf("Transction Success\r\n" );
@@ -80,154 +70,23 @@ int main(void)
 		}else if(keyval==KEY2_PRES)
 		{
 			Locate_Rle(1000,7500,CCW);//按下KEY2，以7000Hz的频率 逆时针发1000脉冲
-		}else if(keyval==KEY4_PRES)
-		{
-	
-		}				
-		CanR_Flag = CAN1_Receive_Msg(CanRxBuf);
-		if(CanR_Flag)
-		{
-			for(int i=0;i<8;i++)
-			printf("Receive %d \r\n",CanRxBuf[i]);
-		}
-			
-	
+		}			
 
 	
+
+	#if 0    //PC端串口调试程序
+		temp= RxProcess();
+		if(USART_RX_BUF[0]!=0)printf("电机速率:%d\r\n",100-temp);
+		//清除串口数据,准备下一次接收
+		for(i=0;i<USART_RX_STA;i++)
+		{
+			USART_RX_BUF[i]=0;
+		}
+		USART_RX_STA=0;
+#endif
 	}	
 }
 
-//void SetMotorPWM(u32 arry)
-//{   
-//			double	alpha;//当前转向角
-//			u32 duty= arry;
-//			
-//			if(flag==1){//右转
-//				alpha = abs(current_pos)*0.00063;//每个脉冲转角约为0.00063度
-//				duty=1.0/Diff_Calculation(alpha)*arry; //正常占空系数*内外圈速度比例
-//				TIM_SetCompare1(TIM5,duty);
-//				TIM_SetCompare2(TIM5,duty);
-//			}
-//			else if(flag==2){//左转
-//				alpha = abs(current_pos)*0.00063;//每个脉冲转角约为0.00063度
-//				duty=1.0/Diff_Calculation(alpha)*arry; //正常占空系数*内外圈速度比例
-//				TIM_SetCompare3(TIM5,duty);
-//				TIM_SetCompare4(TIM5,duty);
-//				//printf("diff: %d \r\n",duty);
-//			}
-//			else
-//			{
-//				TIM_SetCompare1(TIM5,duty);
-//				TIM_SetCompare2(TIM5,duty);
-//				TIM_SetCompare3(TIM5,duty);
-//				TIM_SetCompare4(TIM5,duty);
-//			}
-//}
-
-//void RemoteControler() //遥控程序
-//{
-//		
-//		k1=(float)(500-0)/(float)(216-87);//捕获的测量值是87~215，标定到0~500
-//		k_right=(float)35000/(float)(21-15);//右转系数
-//		k_left=(float)35000/(float)(15-8);//左转系数
-//		count1=tim4up1/10;		   //去掉最后一位不稳定的数（处理之后范围大概在87~215）
-//		count2=tim4up2/10;
-//		count3=tim4up3/10;		   //去掉最后一位不稳定的数（处理之后范围大概在87~215）
-//		count4=tim4up4/10;
-//		
-//		
-//		//printf("HIGH:%lld us\r\n",count1); 
-//		//printf("DIR: %d \r\n",count2);
-//		//printf("DIR: %lld \n",count3);
-//	
-//	
-//		//将捕获计数转换成PWM电机控制
-//		//count1=count1/10;//
-//		if(count1<300)
-//		{
-//			//printf("HIGH:%d us\r\n",tim4up1); 
-//			count1=500-(int)(k1*(count1-87));//标定到（500，0）区间
-//			//printf("duty:%d \r\n",count1); 
-//			SetMotorPWM(flag,count1);
-//		}
-//		if(count2<109)
-//		{
-//			GPIO_SetBits(GPIOH,GPIO_Pin_9);//正转
-//			GPIO_ResetBits(GPIOH,GPIO_Pin_14);
-//			GPIO_SetBits(GPIOH,GPIO_Pin_13);//不刹车
-//			GPIO_SetBits(GPIOH,GPIO_Pin_15);//电机使
-//	
-//		}
-//		else if(count2>190&&count2<300)
-//		{
-//			GPIO_ResetBits(GPIOH,GPIO_Pin_9);//反转
-//			GPIO_SetBits(GPIOH,GPIO_Pin_14);
-//			GPIO_SetBits(GPIOH,GPIO_Pin_13);//不刹车
-//			GPIO_SetBits(GPIOH,GPIO_Pin_15);//电机使
-//			
-//		}
-//		else if(count2>140&&count2<160) 
-//		{
-//			 GPIO_ResetBits(GPIOH,GPIO_Pin_15);//关闭使能
-//			
-//		}
-//		
-//		pst=count3/10;  //将遥控器输入标定到(8,21)
-//		if(pst<300&&pst!=pst_old)//遥控方向有变化
-//		{
-//			dir_delay ++;
-//			if(dir_delay==5000)//延时，防止频繁转动
-//			{
-//				if(pst!=pst_old)
-//				{
-//					dir_delay=0;
-//					if(pst>15&&pst<30&&pst!=pst_old)//右转
-//					{
-//						pst_old=pst;
-//						flag=1;
-//						Locate_Abs(((int)k_right*(pst-15)),7000);
-//						
-//						
-//					}
-//					else if(pst>0&&pst<15&&pst!=pst_old)//左转
-//					{
-//						pst_old=pst;
-//						flag=2;
-//						Locate_Abs(-35000+(int)k_left*(pst-8),7000);
-//						
-//						
-//					}
-//					else if(pst==15&&pst!=pst_old)
-//					{	
-//						if(current_pos!=0)
-//						{
-//							flag=0;
-//							Locate_Abs(0,7000);
-//							
-//							
-//						}
-//						pst_old =15;
-//					}
-//				}
-//			}
-//		}
-//	
-
-//}	
-//u32 SpeedFeedback(u32 delay)
-//{
-//		 
-//		delay ++;
-//		if(delay == 5)
-//		{
-//			delay=0;
-//			printf("[ motor 1: %d hz ]  ",f1);
-//			printf("[ motor 2: %d hz ] \n",f2);
-//			printf("[ motor 3: %d us ]  ",f3);
-//			printf("[ motor 4: %d us ]\r\n",f4);
-//		}
-//	return delay;
-//}
 //u8 RxProcess(void)//串口数据处理
 //{
 //	u8 temp = 0;
